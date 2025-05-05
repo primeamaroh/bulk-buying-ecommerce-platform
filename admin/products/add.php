@@ -74,12 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending'
             )
         ");
+        $variations_json = json_encode($variations);
+        $stmt->bind_param("ssidsdssd", $name, $description, $quantity, $price, $variations_json, $duration, $source_website, $dimensions, $weight, $image_path);
         
-        if ($stmt->execute([
-            $name, $description, $quantity, $price, 
-            json_encode($variations), $duration, $source_website,
-            $dimensions, $weight, $image_path
-        ])) {
+        if ($stmt->execute()) {
             $_SESSION['success'] = 'Product added successfully';
             redirect('/admin/dashboard.php');
         } else {
