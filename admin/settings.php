@@ -7,7 +7,6 @@ if (!isLoggedIn() || !isAdmin()) {
     redirect('/auth/login.php');
 }
 
-// Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         validateToken($_POST['csrf_token']);
@@ -31,8 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 shipping_fee_per_kg = ?,
                 updated_at = CURRENT_TIMESTAMP
         ");
+        $stmt->bind_param("dd", $admin_fee, $shipping_fee);
         
-        if ($stmt->execute([$admin_fee, $shipping_fee])) {
+        if ($stmt->execute()) {
             $_SESSION['success'] = 'Settings updated successfully';
         } else {
             throw new Exception('Failed to update settings');
@@ -45,8 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get current settings
-$stmt = $db->query("SELECT * FROM admin_settings LIMIT 1");
-$settings = $stmt->fetch(PDO::FETCH_ASSOC);
+$result = $db->query("SELECT * FROM admin_settings LIMIT 1");
+$settings = $result->fetch_assoc();
 
 include '../components/header.php';
 ?>
