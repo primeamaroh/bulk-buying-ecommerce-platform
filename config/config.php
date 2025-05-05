@@ -5,6 +5,12 @@ session_start();
 define('SITE_NAME', 'Bulk Buying Store');
 define('SITE_URL', 'http://localhost:8000');
 
+// Database credentials
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
+define('DB_NAME', 'bulk_buying_db');
+
 // Directory settings
 define('ROOT_PATH', dirname(__DIR__));
 define('UPLOADS_PATH', ROOT_PATH . '/uploads');
@@ -87,7 +93,9 @@ function calculateAdminFee($amount) {
     global $db;
     $stmt = $db->prepare("SELECT admin_fee_percentage FROM admin_settings LIMIT 1");
     $stmt->execute();
-    $fee_percentage = $stmt->fetchColumn();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $fee_percentage = $row['admin_fee_percentage'];
     return ($amount * $fee_percentage) / 100;
 }
 
@@ -95,7 +103,9 @@ function calculateShippingFee($weight) {
     global $db;
     $stmt = $db->prepare("SELECT shipping_fee_per_kg FROM admin_settings LIMIT 1");
     $stmt->execute();
-    $fee_per_kg = $stmt->fetchColumn();
+    $result = $stmt->get_result();
+    $row = $result->fetch_assoc();
+    $fee_per_kg = $row['shipping_fee_per_kg'];
     return $weight * $fee_per_kg;
 }
 
