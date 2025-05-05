@@ -50,13 +50,22 @@ if ($type === 'products') {
     };
 }
 
-// Execute query
-$stmt = $db->prepare($base_query);
 if ($status !== 'all') {
-    $stmt->bindParam(':status', $status);
+    $stmt = $db->prepare($base_query);
+    $stmt->bind_param("s", $status);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $items = [];
+    while ($row = $result->fetch_assoc()) {
+        $items[] = $row;
+    }
+} else {
+    $result = $db->query($base_query);
+    $items = [];
+    while ($row = $result->fetch_assoc()) {
+        $items[] = $row;
+    }
 }
-$stmt->execute();
-$items = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include '../components/header.php';
 ?>
