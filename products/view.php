@@ -9,7 +9,6 @@ if (!$product_id) {
     redirect('/products/browse.php');
 }
 
-// Get product details
 $stmt = $db->prepare("
     SELECT p.*, 
            (SELECT COUNT(*) FROM orders WHERE product_id = p.id AND status != 'cancelled') as order_count,
@@ -17,8 +16,10 @@ $stmt = $db->prepare("
     FROM products p 
     WHERE p.id = ?
 ");
-$stmt->execute([$product_id]);
-$product = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt->bind_param("i", $product_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$product = $result->fetch_assoc();
 
 if (!$product) {
     $_SESSION['error'] = 'Product not found';
