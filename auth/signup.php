@@ -35,16 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Check if email already exists
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
-        $stmt->execute([$email]);
-        if ($stmt->fetch()) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
             throw new Exception('Email already registered');
         }
         
         // Create new user
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
         $stmt = $db->prepare("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, 'user')");
+        $stmt->bind_param("sss", $name, $email, $hashed_password);
         
-        if ($stmt->execute([$name, $email, $hashed_password])) {
+        if ($stmt->execute()) {
             $_SESSION['success'] = 'Registration successful! Please login.';
             redirect('/auth/login.php');
         } else {
