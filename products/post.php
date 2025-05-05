@@ -55,11 +55,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 website, company, votes, status
             ) VALUES (?, ?, ?, ?, ?, ?, 0, 'pending')
         ");
+        $stmt->bind_param("isssss", $_SESSION['user_id'], $title, $description, $image_path, $website, $company);
         
-        if ($stmt->execute([
-            $_SESSION['user_id'], $title, $description,
-            $image_path, $website, $company
-        ])) {
+        if ($stmt->execute()) {
             $_SESSION['success'] = 'Product request posted successfully';
             redirect('/products/browse.php');
         } else {
