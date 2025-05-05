@@ -134,7 +134,7 @@ include '../components/header.php';
             <h2 class="text-xl font-semibold text-gray-900 mb-4">Recent Activity</h2>
             <div class="space-y-4">
                 <?php
-                $stmt = $db->query("
+                $result = $db->query("
                     SELECT * FROM (
                         SELECT 'order' as type, o.created_at, u.name as user_name, p.name as product_name, o.status
                         FROM orders o
@@ -147,7 +147,11 @@ include '../components/header.php';
                     ) ORDER BY created_at DESC
                     LIMIT 5
                 ");
-                $activities = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $activities = [];
+                while ($row = $result->fetch_assoc()) {
+                    $activities[] = $row;
+                }
 
                 foreach ($activities as $activity): ?>
                     <div class="flex items-center p-4 bg-gray-50 rounded-lg">
