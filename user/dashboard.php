@@ -7,7 +7,6 @@ if (!isLoggedIn()) {
     redirect('/auth/login.php');
 }
 
-// Get user's orders
 $stmt = $db->prepare("
     SELECT o.*, p.name as product_name, p.image_path
     FROM orders o
@@ -15,8 +14,13 @@ $stmt = $db->prepare("
     WHERE o.user_id = ?
     ORDER BY o.created_at DESC
 ");
-$stmt->execute([$_SESSION['user_id']]);
-$orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$orders = [];
+while ($row = $result->fetch_assoc()) {
+    $orders[] = $row;
+}
 
 // Get user's votes
 $stmt = $db->prepare("
@@ -26,8 +30,13 @@ $stmt = $db->prepare("
     WHERE v.user_id = ?
     ORDER BY v.created_at DESC
 ");
-$stmt->execute([$_SESSION['user_id']]);
-$votes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->bind_param("i", $_SESSION['user_id']);
+$stmt->execute();
+$result = $stmt->get_result();
+$votes = [];
+while ($row = $result->fetch_assoc()) {
+    $votes[] = $row;
+}
 
 // Handle order cancellation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cancel_order'])) {
